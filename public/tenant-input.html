@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input Data Penyewa</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="sidebar-container"></div>
+  <script src="/sidebar.js"></script>
+
+  <main>
+    <h1>Form Input Data Penyewa</h1>
+    <!-- Form input penyewa -->
+    <form id="tenantForm">
+      <label>Nama Penyewa: <input type="text" name="nama" required></label><br>
+      <label>Tower:
+        <select name="tower">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
+      </label><br>
+      <label>Lantai: <input type="text" name="lantai" required></label><br>
+      <label>Nomor Unit: <input type="text" name="unit" required></label><br>
+      <label>Status Kewarganegaraan:
+        <select name="status_kewarganegaraan">
+          <option value="WNI">WNI</option>
+          <option value="WNA">WNA</option>
+        </select>
+      </label><br>
+      <label>Metode Pembayaran:
+        <select name="metode_pembayaran" id="metode">
+          <option value="Cash">Cash</option>
+          <option value="Kartu Kredit">Kartu Kredit</option>
+          <option value="Kartu Debit">Kartu Debit</option>
+          <option value="QRIS">QRIS</option>
+          <option value="Others">Others</option>
+        </select>
+      </label><br>
+      <label id="metodeLainDiv" style="display:none;">Metode Pembayaran Lainnya: <input type="text" name="metode_lain"></label><br>
+
+      <label>Tanggal Check-in: <input type="date" name="tanggal_checkin" id="tanggal_checkin"></label><br>
+      <label>Waktu Check-in: <input type="time" name="waktu_checkin" id="waktu_checkin"></label><br>
+      <label>Tanggal Check-out: <input type="date" name="tanggal_checkout"></label><br>
+      <p id="lamaMenginap"></p>
+      <button type="submit">Simpan Data Penyewa</button>
+    </form>
+  </main>
+
+  <script src="/scripts/sidebar.js"></script>
+  <script>
+    // Isi default tanggal/waktu
+    document.getElementById("tanggal_checkin").valueAsDate = new Date();
+    document.getElementById("waktu_checkin").value = new Date().toLocaleTimeString('it-IT', {hour12: false, hour: "2-digit", minute:"2-digit"});
+
+    // Metode pembayaran lainnya toggle
+    document.getElementById("metode").addEventListener("change", (e) => {
+      const metodeLainDiv = document.getElementById("metodeLainDiv");
+      if (e.target.value === "Others") metodeLainDiv.style.display = "block";
+      else metodeLainDiv.style.display = "none";
+    });
+
+    // Hitung lama menginap
+    const checkinInput = document.getElementById("tanggal_checkin");
+    const checkoutInput = document.querySelector("input[name='tanggal_checkout']");
+    checkoutInput.addEventListener("change", () => {
+      const checkin = new Date(checkinInput.value);
+      const checkout = new Date(checkoutInput.value);
+      const lama = (checkout - checkin) / (1000 * 60 * 60 * 24);
+      const lamaText = document.getElementById("lamaMenginap");
+      if (lama >= 0) {
+        lamaText.textContent = `Lama Menginap: ${lama} hari`;
+      } else {
+        lamaText.textContent = "Tanggal check-in/tanggal check-out tidak valid.";
+      }
+    });
+  </script>
+</body>
+</html>

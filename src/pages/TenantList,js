@@ -1,0 +1,114 @@
+// src/pages/TenantList.js
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import * as XLSX from "xlsx";
+
+const col_rename = {
+  nama: "Nama Penyewa",
+  status_kewarganegaraan: "Status Kewarganegaraan",
+  tower: "Tower",
+  lantai: "Lantai",
+  unit: "Unit",
+  metode_pembayaran: "Metode Pembayaran",
+  tanggal_checkin: "Tanggal Check-in",
+  waktu_checkin: "Waktu Check-in",
+  tanggal_checkout: "Tanggal Check-out",
+  waktu_checkout: "Waktu Check-out",
+  lama_menginap: "Lama Menginap (hari)",
+  komentar_str: "Komentar",
+  agen: "Agen",
+  diedit_oleh: "Diedit Oleh",
+};
+
+const TenantList = () => {
+  const [data, setData] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
+  const [form, setForm] = useState({});
+
+  const fetchData = async () => {
+    const res = await axios.get("/api/tenant");
+    setData(res.data);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleEdit = (i) => {
+    setEditIndex(i);
+    setForm(data[i]);
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    await axios.put(`/api/tenant/${editIndex}`, {
+      ...form,
+      diedit_oleh: localStorage.getItem("agent"),
+    });
+    setEditIndex(null);
+    fetchData();
+  };
+
+  const exportCSV = () => {
+    const renamed = data.map((row) => {
+      const renamedRow = {};
+      for (const key in col_rename) {
+        renamedRow[col_rename[key]] = row[key] || "";
+      }
+      return renamedRow;
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(renamed);
+    XLSX.utils.book_append_sheet(wb, ws, "Penyewa");
+    XLSX.writeFile(wb, "penyewa.csv");
+  };
+
+  return (
+    <div>
+      <h2>Data Penyewa</h2>
+      <table border="1">
+        <thead>
+          <tr>
+            {Object.values(col_rename).map((v) => (
+              <th key={v}>{v}</th>
+            ))}
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, i) => (
+            <tr key={i}>
+              {Object.keys(col_rename).map((key) =>
+                editIndex === i && ["tanggal_checkout", "waktu_checkout", "komentar_str"].includes(key) ? (
+                  <td key={key}>
+                    <input
+                      name={key}
+                      value={form[key] || ""}
+                      onChange={handleChange}
+                    />
+                  </td>
+                ) : (
+                  <td key={key}>{row[key]}</td>
+                )
+              )}
+              <td>
+                {editIndex === i ? (
+                  <button onClick={handleSave}>Simpan</button>
+                ) : (
+                  <button onClick={() => handleEdit(i)}>Edit</button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={exportCSV}>Export CSV</button>
+    </div>
+  );
+};
+
+export default TenantList;

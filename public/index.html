@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Penyewa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+    }
+    #sidebar {
+      width: 200px;
+      background: #f0f0f0;
+      height: 100vh;
+      padding: 20px;
+    }
+    #sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    #sidebar ul li {
+      margin-bottom: 15px;
+    }
+    #sidebar ul li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    #content {
+      flex-grow: 1;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <nav id="sidebar">
+    <ul>
+      <li><a href="tenant-list.html">Daftar Penyewa</a></li>
+      <li><a href="tenant-input.html">Input Data Penyewa</a></li>
+      <li><a href="#" id="logoutBtn">Logout</a></li>
+    </ul>
+  </nav>
+  <div id="content">
+    <h1>Selamat datang di Dashboard Penyewa</h1>
+    <p>Pilih menu di sidebar untuk mulai.</p>
+  </div>
+
+  <script>
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      // Contoh hapus token / info user di localStorage
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("userEmail");
+      // Redirect ke login
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

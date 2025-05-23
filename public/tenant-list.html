@@ -1,0 +1,95 @@
+<!-- public/tenant-list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar Penyewa</title>
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="sidebar-container"></div>
+
+  <div class="main-content">
+    <h1>Daftar Penyewa</h1>
+    <div id="welcome-message" class="alert" style="display:none;">Selamat datang, <span id="user-email"></span>!</div>
+
+    <div class="button-group">
+      <button onclick="refreshTable()">Refresh Table</button>
+      <button onclick="exportCSV()">Export CSV</button>
+    </div>
+
+    <table id="tenant-table" border="1">
+      <thead>
+        <tr>
+          <th>Nama Penyewa</th>
+          <th>Status Kewarganegaraan</th>
+          <th>Tower</th>
+          <th>Lantai</th>
+          <th>Unit</th>
+          <th>Metode Pembayaran</th>
+          <th>Tanggal Check-in</th>
+          <th>Waktu Check-in</th>
+          <th>Tanggal Check-out</th>
+          <th>Waktu Check-out</th>
+          <th>Lama Menginap (hari)</th>
+          <th>Komentar</th>
+          <th>Agen</th>
+          <th>Diedit Oleh</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <script src="/sidebar.js"></script>
+  <script>
+    const colOrder = [
+      "nama", "status_kewarganegaraan", "tower", "lantai", "unit",
+      "metode_pembayaran", "tanggal_checkin", "waktu_checkin",
+      "tanggal_checkout", "waktu_checkout", "lama_menginap",
+      "komentar_str", "agen", "diedit_oleh"
+    ];
+
+    async function refreshTable() {
+      try {
+        const res = await axios.get("/api/rentals");
+        const data = res.data;
+        const tbody = document.getElementById("table-body");
+        tbody.innerHTML = "";
+
+        data.forEach((row) => {
+          const tr = document.createElement("tr");
+          colOrder.forEach((key) => {
+            const td = document.createElement("td");
+            td.textContent = row[key] || "";
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        alert("Gagal memuat data penyewa.");
+        console.error(err);
+      }
+    }
+
+    function exportCSV() {
+      window.location.href = "/api/rentals/export/all";
+    }
+
+    // Show welcome message
+    const email = localStorage.getItem("email");
+    if (email) {
+      document.getElementById("user-email").textContent = email;
+      const welcome = document.getElementById("welcome-message");
+      welcome.style.display = "block";
+      setTimeout(() => {
+        welcome.style.display = "none";
+      }, 10000);
+    }
+
+    refreshTable();
+  </script>
+</body>
+</html>

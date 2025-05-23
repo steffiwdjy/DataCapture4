@@ -1,0 +1,22 @@
+<!-- public/sidebar.html -->
+<div id="sidebar">
+  <h2>Tenant Management</h2>
+  <p id="welcome-user">Login sebagai: <span id="user-email"></span></p>
+  <ul>
+    <li><a href="/tenant-input.html">Input Data Penyewa</a></li>
+    <li><a href="/tenant-list.html">Lihat/Edit Data Penyewa</a></li>
+    <li><a href="#" onclick="logout()">Logout</a></li>
+  </ul>
+</div>
+
+<script>
+  const email = sessionStorage.getItem("userEmail") || "Tidak diketahui";
+  document.getElementById("user-email").textContent = email;
+  function logout() {
+    fetch("/api/logout", { method: "POST" })
+      .then(() => {
+        sessionStorage.removeItem("userEmail");
+        window.location.href = "/login.html";
+      });
+  }
+</script>
